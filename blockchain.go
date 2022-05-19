@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	MINING_DIFFICULTY = 5
+	MINING_DIFFICULTY = 3
 	MINING_SENDER     = "THE BLOCKCHAIN"
 	MINING_REWARD     = 1.0
 )
@@ -142,6 +142,22 @@ func (bc *Blockchain) Mining() bool {
 	return true
 }
 
+func (bc *Blockchain) CalculateTotalAmout(blockchainAddress string) float32 {
+	var totalAmount float32 = 0.0
+	for _, b := range bc.chain {
+		for _, t := range b.transactions {
+			value := t.value
+			if blockchainAddress == t.recipientBlockchainAddress {
+				totalAmount += value
+			}
+			if blockchainAddress == t.senderBlockchainAddress {
+				totalAmount -= value
+			}
+		}
+	}
+	return totalAmount
+}
+
 /////////////////////
 // Transaction
 /////////////////////
@@ -191,4 +207,10 @@ func main() {
 	blockChain.AddTransaction("C", "E", 1.5)
 	blockChain.Mining()
 	blockChain.Print()
+
+	fmt.Printf("\n\n%s Caluculate total amount %s\n", strings.Repeat("-", 25), strings.Repeat("-", 25))
+	fmt.Printf("A      %.1f\n", blockChain.CalculateTotalAmout("A"))
+	fmt.Printf("B      %.1f\n", blockChain.CalculateTotalAmout("B"))
+	fmt.Printf("C      %.1f\n", blockChain.CalculateTotalAmout("C"))
+	fmt.Printf("mining %.1f\n", blockChain.CalculateTotalAmout(myBlockChainAddress))
 }
